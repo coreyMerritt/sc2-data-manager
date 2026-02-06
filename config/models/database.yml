@@ -1,0 +1,6 @@
+engine: "postgresql"
+host: "127.0.0.1"
+name: "db_name"
+password: "db_password"
+port: 5432
+username: "db_user"

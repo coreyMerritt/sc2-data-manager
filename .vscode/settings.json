@@ -1,0 +1,16 @@
+{
+  "pylint.args": ["--output-format=json"],
+    "pylint.path": [
+    "./.venv/bin/pylint"
+  ],
+  "pylint.severity": {
+    "convention": "Information",
+    "refactor": "Information",
+    "warning": "Warning",
+    "error": "Error",
+    "fatal": "Error"
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:venv",
+  "python-envs.pythonProjects": [],
+  "mypy.enabled": true
+}

@@ -1,0 +1,14 @@
+name: Linters
+on:
+  workflow_call:
+jobs:
+  linters:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env-setup-dev
+        with:
+          python-version: ${{ vars.PYTHON_VERSION }}
+      - shell: bash
+        run: ./tests/linters/00-run-all.sh

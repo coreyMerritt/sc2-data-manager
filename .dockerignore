@@ -1,0 +1,27 @@
+# Caches
+*.*cache/
+.mypy_cache
+.pytest_cache
+.ruff_cache
+__pycache__
+
+# Packaging Data
+*.spec
+*.egg-info/
+build/
+dist/
+
+# Secrets
+.env
+!.env.model
+backups/
+!backups/.gitkeep
+backups/database/
+!backups/database/.gitkeep
+
+# Misc
+.venv
+.vscode
+report
+deploy_db.log
+tests/linters/test.py

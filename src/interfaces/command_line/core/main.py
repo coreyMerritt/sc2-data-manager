@@ -1,0 +1,78 @@
+import argparse
+import sys
+from typing import Callable
+
+from infrastructure.config.parser import ConfigParser
+from infrastructure.cpu.cpu import Cpu
+from infrastructure.database.database import Database
+from infrastructure.disk.disk import Disk
+from infrastructure.environment.environment import Environment
+from infrastructure.memory.memory import Memory
+from infrastructure.types.logger_interface import LoggerInterface
+from interfaces.command_line.core.get.health import get_full_health_report
+from interfaces.command_line.enums.get_target import GetTarget
+from interfaces.command_line.enums.run_target import RunTarget
+from interfaces.command_line.enums.sub_command import SubCommand
+from interfaces.command_line.exceptions.unknown_command_exception import UnknownCommandException
+from interfaces.command_line.exceptions.unknown_run_target_exception import UnknownRunTargetException
+
+
+def add_default_command() -> None:
+  if len(sys.argv) == 1:
+    sys.argv = [sys.argv[0], "run", "server"]
+
+def build_args() -> argparse.Namespace:
+  parser = argparse.ArgumentParser(prog="sc2_data_manager")
+  subparsers = parser.add_subparsers(dest="command", required=True)
+  get_parser = subparsers.add_parser(SubCommand.GET.value)
+  get_subparsers = get_parser.add_subparsers(dest="target", required=True)
+  get_subparsers.add_parser(GetTarget.HEALTH_REPORT.value)
+  run_parser = subparsers.add_parser(SubCommand.RUN.value)
+  run_subparsers = run_parser.add_subparsers(dest="target", required=True)
+  server_parser = run_subparsers.add_parser(RunTarget.SERVER.value)
+  server_parser.add_argument(
+    "--host",
+    default=None,
+    help="Host address to bind to",
+    required=False,
+    type=str
+  )
+  server_parser.add_argument(
+    "--port",
+    default=None,
+    help="Host port to bind to",
+    required=False,
+    type=int
+  )
+  args = parser.parse_args()
+  return args
+
+def handle_args_routing(
+  args: argparse.Namespace,
+  logger: LoggerInterface,
+  config_parser: ConfigParser,
+  cpu: Cpu,
+  database: Database,
+  disk: Disk,
+  environment: Environment,
+  memory: Memory,
+  run_webserver: Callable[[str | None, int | None], None]
+) -> None:
+  if args.command.lower() == SubCommand.GET.value:
+    if args.target.lower() == GetTarget.HEALTH_REPORT.value:
+      get_full_health_report(
+        logger=logger,
+        config_parser=config_parser,
+        cpu=cpu,
+        database=database,
+        disk=disk,
+        environment=environment,
+        memory=memory
+      )
+  elif args.command.lower() == SubCommand.RUN.value:
+    if args.target.lower() == RunTarget.SERVER.value:
+      run_webserver(args.host, args.port)
+    else:
+      raise UnknownRunTargetException()
+  else:
+    raise UnknownCommandException()

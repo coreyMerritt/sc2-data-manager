@@ -1,0 +1,19 @@
+repos:
+  - repo: local
+    hooks:
+      - name: Early Sudo Prompt
+        id: early-sudo-prompt   # This exists to invoke sudo immediately, to stop mid-run permissions timeouts
+        entry: bash -c "sudo -k; sudo true"
+        language: system
+        always_run: true
+        pass_filenames: false
+        stages:
+          - pre-push
+      - name: Run all linters
+        id: tests
+        entry: ./tests/linters/00-run-all.sh
+        language: script
+        always_run: true
+        pass_filenames: false
+        stages:
+          - pre-push

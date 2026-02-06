@@ -1,0 +1,30 @@
+# Caches
+*.*cache/
+.mypy_cache
+.pytest_cache
+.ruff_cache
+__pycache__
+
+# Build & Package Data
+*.spec
+*.egg-info/
+sc2-data-manager.spec
+build/
+dist/
+
+# Secrets
+.env
+!.env.model
+backups/
+!backups/.gitkeep
+backups/database/
+!backups/database/.gitkeep
+config/*
+!config/models
+logs/*
+!logs/.gitkeep
+
+# Misc
+.venv
+report
+tests/linters/test.py

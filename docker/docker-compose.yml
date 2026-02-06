@@ -1,0 +1,47 @@
+services:
+  sc2_data_manager:
+    container_name: sc2_data_manager
+    depends_on:
+      - postgres-18
+    env_file:
+      - ../.env
+    environment:
+      - SC2_DATA_MANAGER_DATABASE_HOST=postgres-18
+      - SC2_DATA_MANAGER_DATABASE_PORT=5432
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 300s
+      retries: 30
+      start_period: 5s
+    image: sc2_data_manager:${docker_image_tag}
+    networks:
+      - sc2_data_manager_network
+    ports:
+      - 8080:8000
+    volumes:
+      - sc2_data_manager_configs:/etc/sc2_data_manager
+  postgres-18:
+    container_name: sc2_data_manager_postgres_18
+    env_file:
+      - ../.env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 300s
+      retries: 30
+      start_period: 5s
+    image: postgres:18
+    networks:
+      - sc2_data_manager_network
+    volumes:
+      - postgres-18-volume:/var/lib/postgresql
+networks:
+  sc2_data_manager_network:
+    name: sc2_data_manager_network
+    driver: bridge
+volumes:
+  sc2_data_manager_configs:
+    name: sc2_data_manager_configs
+  postgres-18-volume:
+    name: sc2_data_manager_postgres_18_data

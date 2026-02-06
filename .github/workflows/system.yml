@@ -1,0 +1,16 @@
+name: Test systems
+on:
+  workflow_call:
+jobs:
+  system-tests:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/env-setup-test
+        with:
+          python-version: ${{ vars.PYTHON_VERSION }}
+      - shell: bash
+        run: sudo .venv/bin/python "./scripts/deploy_db.py"
+      - shell: bash
+        run: ./tests/system/00-run-all.sh
