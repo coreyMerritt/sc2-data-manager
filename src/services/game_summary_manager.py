@@ -6,6 +6,7 @@ from infrastructure.database.mappers.game_summary import GameSummaryMapper
 from infrastructure.database.mappers.graph_point_orms import GraphPointsMapper
 from infrastructure.database.repositories.account_repository import AccountRepository
 from infrastructure.database.repositories.game_summary_repository import GameSummaryRepository
+from infrastructure.disk.disk import Disk
 from infrastructure.types.logger_interface import LoggerInterface
 from services.base_service import BaseService
 from services.exceptions.already_exists_err import AlreadyExistsErr
@@ -13,15 +14,18 @@ from services.mappers.game_summary.create_game_summary_mapper import CreateGameS
 
 
 class GameSummaryManager(BaseService):
+  _disk: Disk
   _account_repository: AccountRepository
   _game_summary_repository: GameSummaryRepository
 
   def __init__(
     self,
     logger: LoggerInterface,
+    disk: Disk,
     account_repository: AccountRepository,
-    game_summary_repository: GameSummaryRepository
+    game_summary_repository: GameSummaryRepository,
   ):
+    self._disk = disk
     self._account_repository = account_repository
     self._game_summary_repository = game_summary_repository
     super().__init__(logger)
@@ -32,27 +36,34 @@ class GameSummaryManager(BaseService):
       game_summary = CreateGameSummaryMapper.byte_string_to_entity(
         byte_string=game_summary_byte_string
       )
-      if self._game_summary_repository.exists(game_summary.filehash):
+      exists_in_db = self._game_summary_repository.exists(game_summary.filehash)
+      exists_on_disk = self._disk.game_summary_file_exists(game_summary.filehash)
+      if exists_in_db and exists_on_disk:
         raise AlreadyExistsErr
-      account_orms = AccountsMapper.domain_to_orm(game_summary)
-      build_order_orms = BuildOrdersMapper.domain_to_orm(game_summary)
-      game_participant_orms = GameParticipantsMapper.domain_to_orm(game_summary)
-      game_summary_orm = GameSummaryMapper.domain_to_orm(game_summary)
-      player_owned_graph_points_orms = GraphPointsMapper.domain_to_orm(game_summary)
-      for i in range(0, 2):
-        try:
-          account_orm = self._account_repository.get(account_orms[i].bnetid)
-          if account_orms[i].name and not account_orm.name:
-            account_orm.name = account_orms[i].name
-        except RepositoryNotFoundErr:
-          account_orm = account_orms[i]
-        game_participant_orms[i].account = account_orm
-        game_participant_orms[i].build_order = build_order_orms[i]
-        game_participant_orms[i].graph_points = player_owned_graph_points_orms[i]
-        game_summary_orm.game_participants = game_participant_orms
-        for graph_points in player_owned_graph_points_orms[i]:
-          graph_points.game_participant = game_participant_orms[i]
-      self._game_summary_repository.create(game_summary_orm)
+      if not exists_on_disk:
+        self._disk.write_game_summary_file(game_summary_byte_string, game_summary.filehash)
+        self._logger.debug(f"Successfully wrote game summary to disk: {game_summary.filehash}...")
+      if not exists_in_db:
+        account_orms = AccountsMapper.domain_to_orm(game_summary)
+        build_order_orms = BuildOrdersMapper.domain_to_orm(game_summary)
+        game_participant_orms = GameParticipantsMapper.domain_to_orm(game_summary)
+        game_summary_orm = GameSummaryMapper.domain_to_orm(game_summary)
+        player_owned_graph_points_orms = GraphPointsMapper.domain_to_orm(game_summary)
+        for i in range(0, 2):
+          try:
+            account_orm = self._account_repository.get(account_orms[i].bnetid)
+            if account_orms[i].name and not account_orm.name:
+              account_orm.name = account_orms[i].name
+          except RepositoryNotFoundErr:
+            account_orm = account_orms[i]
+          game_participant_orms[i].account = account_orm
+          game_participant_orms[i].build_order = build_order_orms[i]
+          game_participant_orms[i].graph_points = player_owned_graph_points_orms[i]
+          game_summary_orm.game_participants = game_participant_orms
+          for graph_points in player_owned_graph_points_orms[i]:
+            graph_points.game_participant = game_participant_orms[i]
+        self._game_summary_repository.create(game_summary_orm)
+        self._logger.debug(f"Successfully wrote game summary to database: {game_summary.filehash}...")
     except Exception as e:
       self._raise_service_exception(e)
     # create_user_som = CreateGameSummaryMapper.entity_to_som(created_user)

@@ -92,6 +92,7 @@ def handle_args_routing(
     if args.target.lower() == IngestTarget.SUMMARY.value:
       ingest_game_summary(
         file_path=args.s2gs_file_path,
+        disk=disk,
         logger=logger,
         account_repository=account_repository,
         game_summary_repository=game_summary_repository

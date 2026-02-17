@@ -6,8 +6,11 @@ set -o pipefail
 set -u
 set -x
 
-files="$(ls ~/summary_files)"
 
-for file in $files; do
-  ./cli ingest summary ~/summary_files/$file
+game_summary_files_dir="~/summary_files"
+
+
+files="$(ls "$game_summary_files_dir")"
+for filename in $files; do
+  ./cli ingest summary "${game_summary_files_dir}/${filename}"
 done

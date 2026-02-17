@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 
 import psutil
@@ -10,11 +11,27 @@ from infrastructure.disk.models.disk_health_report import DiskHealthReport
 
 
 class Disk(BaseInfrastructure):
+  _game_summary_file_directory: str
   _maximum_healthy_usage_percentage: float
 
   def __init__(self, disk_config: DiskConfig):
+    self._game_summary_file_directory = disk_config.game_summary_files_directory
     self._maximum_healthy_usage_percentage = disk_config.maximum_healthy_usage_percentage
     super().__init__()
+
+  def game_summary_file_exists(self, filehash: str) -> bool:
+    directory = Path(self._game_summary_file_directory).expanduser()
+    if not directory.exists():
+      directory.mkdir(parents=True, exist_ok=True)
+    filepath = directory / Path(f"{filehash}.s2gs")
+    return filepath.exists()
+
+  def write_game_summary_file(self, game_summary_byte_string: bytes, filehash: str) -> None:
+    directory = Path(self._game_summary_file_directory).expanduser()
+    if not directory.exists():
+      directory.mkdir(parents=True, exist_ok=True)
+    filepath = directory / Path(f"{filehash}.s2gs")
+    filepath.write_bytes(game_summary_byte_string)
 
   def get_health_report(self) -> DiskHealthReport:
     maximum_healthy_usage_percentage = self._maximum_healthy_usage_percentage

@@ -13,6 +13,11 @@ def build_final_disk_config(
   disk_config_dict: Dict[str, Any]
 ) -> DiskConfig:
   _ = config_parser.parse_disk_config(disk_config_dict)
+  disk_config_dict["game_summary_files_directory"] = get_final_config_var(
+    logger=logger,
+    config_var=disk_config_dict["game_summary_files_directory"],
+    env_var=EnvVar.GAME_SUMMARY_FILES_DIRECTORY
+  )
   disk_config_dict["maximum_healthy_usage_percentage"] = get_final_config_var(
     logger=logger,
     config_var=disk_config_dict["maximum_healthy_usage_percentage"],
