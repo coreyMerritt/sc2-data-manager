@@ -52,7 +52,10 @@ class GameSummaryManager(BaseService):
         player_owned_graph_points_orms = GraphPointsMapper.domain_to_orm(game_summary)
         for i in range(0, 2):
           try:
-            account_orm = self._account_repository.get(account_orms[i].bnetid)
+            account_orm = self._account_repository.get(
+              bnetid=account_orms[i].bnetid,
+              region=account_orms[i].region
+            )
             if account_orms[i].name and not account_orm.name:
               account_orm.name = account_orms[i].name
           except RepositoryNotFoundErr:

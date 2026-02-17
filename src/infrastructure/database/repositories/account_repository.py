@@ -14,11 +14,12 @@ class AccountRepository:
   def __init__(self, database: Database):
     self._database = database
 
-  def exists(self, bnetid: int) -> bool:
+  def exists(self, bnetid: int, region: str) -> bool:
     try:
       with self._database.get_session() as session:
         select_statement = select(AccountORM).where(
-          AccountORM.bnetid == bnetid
+          col(AccountORM.bnetid) == bnetid,
+          col(AccountORM.region) == region
         )
         first_account_orm_match = session.exec(select_statement).first()
     except SQLAlchemyError as e:
@@ -44,11 +45,12 @@ class AccountRepository:
         raise RepositoryUnavailableErr() from e
       return account_orm
 
-  def get(self, bnetid: int) -> AccountORM:
+  def get(self, bnetid: int, region: str) -> AccountORM:
     try:
       with self._database.get_session() as session:
         select_statement = select(AccountORM).where(
-          AccountORM.bnetid == bnetid
+          col(AccountORM.bnetid) == bnetid,
+          col(AccountORM.region) == region
         )
         first_account_orm_match = session.exec(select_statement).first()
     except SQLAlchemyError as e:
@@ -57,12 +59,13 @@ class AccountRepository:
       raise RepositoryNotFoundErr()
     return first_account_orm_match
 
-  def delete(self, bnetid: int) -> AccountORM:
-    account_orm = self.get(bnetid)
+  def delete(self, bnetid: int, region: str) -> AccountORM:
+    account_orm = self.get(bnetid, region)
     try:
       with self._database.get_session() as session:
         select_statement = delete(AccountORM).where(
-          col(AccountORM.bnetid) == bnetid
+          col(AccountORM.bnetid) == bnetid,
+          col(AccountORM.region) == region
         )
         session.exec(select_statement).first()
     except SQLAlchemyError as e:

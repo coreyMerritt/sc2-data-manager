@@ -16,7 +16,8 @@ class AccountsMapper:
       assert isinstance(player, PlayerSummary)
       account_orm = AccountORM(
         name=None,
-        bnetid=player.bnetid
+        bnetid=player.bnetid,
+        region=player.region
       )
       account_orms.append(account_orm)
     return account_orms

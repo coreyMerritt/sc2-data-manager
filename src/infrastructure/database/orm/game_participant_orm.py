@@ -1,5 +1,5 @@
-from typing import TYPE_CHECKING, ClassVar, List
-from sqlmodel import Field, Relationship, SQLModel
+from typing import TYPE_CHECKING, ClassVar
+from sqlmodel import Field, ForeignKeyConstraint, Relationship, SQLModel
 
 
 if TYPE_CHECKING:
@@ -11,6 +11,23 @@ if TYPE_CHECKING:
 
 class GameParticipantORM(SQLModel, table=True):
   __tablename__: ClassVar[str] = "game_participant"
+  __table_args__ = (
+    ForeignKeyConstraint(
+        ["account_bnetid", "account_region"],
+        ["account.bnetid", "account.region"],
+    ),
+  )
+  account_bnetid: int = Field(
+    primary_key=False,
+    unique=False,
+    nullable=False
+  )
+  account_region: str = Field(
+    primary_key=False,
+    unique=False,
+    nullable=False
+  )
+
   id: int | None = Field(
     primary_key=True,
     unique=True,
@@ -23,12 +40,6 @@ class GameParticipantORM(SQLModel, table=True):
     unique=False,
     nullable=False,
     foreign_key="game_summary.filehash"
-  )
-  account_bnetid: int = Field(
-    primary_key=False,
-    unique=False,
-    nullable=False,
-    foreign_key="account.bnetid"
   )
 
   is_ai: bool = Field(

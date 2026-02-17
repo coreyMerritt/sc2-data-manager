@@ -34,6 +34,7 @@ class GameParticipantsMapper:
       participant_orm = GameParticipantORM(
         game_filehash=game_summary.filehash,
         account_bnetid=player.bnetid,
+        account_region=player.region,
         is_ai=player.is_ai,
         is_winner=player.is_winner,
         apm=player_stats['APM'],

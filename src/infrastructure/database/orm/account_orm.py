@@ -8,7 +8,12 @@ class AccountORM(SQLModel, table=True):
   __tablename__: ClassVar[str] = "account"
   bnetid: int = Field(
     primary_key=True,
-    unique=True,
+    unique=False,
+    nullable=False
+  )
+  region: str = Field(
+    primary_key=True,
+    unique=False,
     nullable=False
   )
 
