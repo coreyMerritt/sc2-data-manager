@@ -11,6 +11,7 @@ from infrastructure.types.logger_interface import LoggerInterface
 from services.base_service import BaseService
 from services.exceptions.already_exists_err import AlreadyExistsErr
 from services.mappers.game_summary.create_game_summary_mapper import CreateGameSummaryMapper
+from services.models.outputs.game_summary.create_game_summary_som import CreateGameSummarySOM
 
 
 class GameSummaryManager(BaseService):
@@ -30,7 +31,7 @@ class GameSummaryManager(BaseService):
     self._game_summary_repository = game_summary_repository
     super().__init__(logger)
 
-  def ingest_game_summary(self, game_summary_byte_string: bytes) -> None:
+  def ingest_game_summary(self, game_summary_byte_string: bytes) -> CreateGameSummarySOM:
     self._logger.debug("Attempting ingest game summary...")
     try:
       game_summary = CreateGameSummaryMapper.byte_string_to_entity(
@@ -64,6 +65,9 @@ class GameSummaryManager(BaseService):
             graph_points.game_participant = game_participant_orms[i]
         self._game_summary_repository.create(game_summary_orm)
         self._logger.debug(f"Successfully wrote game summary to database: {game_summary.filehash}...")
+      return CreateGameSummarySOM(
+        filehash=game_summary.filehash
+      )
     except Exception as e:
       self._raise_service_exception(e)
     # create_user_som = CreateGameSummaryMapper.entity_to_som(created_user)

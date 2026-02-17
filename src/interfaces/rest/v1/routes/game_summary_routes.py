@@ -14,6 +14,6 @@ router = APIRouter(prefix="/api/v1/game_summaries")
 async def create_game_summary(
   req: Request
 ) -> SC2DataManagerHTTPResponse:
-  return await controller.create_user(
+  return await controller.create_game_summary(
     req=req
   )
