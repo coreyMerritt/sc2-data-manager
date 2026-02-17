@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 import ulid as ULID
 
@@ -37,7 +37,7 @@ class User:
     self.email_verified = False
     if email_verified:
       self.email_verified = email_verified
-    self.created_at = datetime.now(tz=UTC)
+    self.created_at = datetime.now(tz=timezone.utc)
     if created_at:
       self.created_at = created_at
     self.disabled_at = None
@@ -115,7 +115,7 @@ class User:
 
   def disable(self) -> None:
     if self.disabled_at is None:
-      self.disabled_at = datetime.now(UTC)
+      self.disabled_at = datetime.now(tz=timezone.utc)
 
   def __eq__(self, other):
     return isinstance(other, User) and self.ulid == other.ulid

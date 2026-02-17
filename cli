@@ -17,5 +17,5 @@ while true; do
 done
 
 # Run cli entrypoint, pass args
-.venv/bin/python -u ./src/composition/cli_entrypoint.py $@
+.venv/bin/python -u ./src/composition/cli_entrypoint.py "$@"
 exit 0

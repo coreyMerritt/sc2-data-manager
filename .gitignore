@@ -14,6 +14,7 @@ dist/
 
 # Secrets
 .env
+*.db
 !.env.model
 backups/
 !backups/.gitkeep
@@ -28,3 +29,4 @@ logs/*
 .venv
 report
 tests/linters/test.py
+summary_files/

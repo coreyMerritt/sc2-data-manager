@@ -27,6 +27,8 @@ from infrastructure.cpu.models.cpu_config import CpuConfig
 from infrastructure.database.database import Database
 from infrastructure.database.exceptions.database_initialization_err import DatabaseInitializationErr
 from infrastructure.database.models.database_config import DatabaseConfig
+from infrastructure.database.repositories.account_repository import AccountRepository
+from infrastructure.database.repositories.game_summary_repository import GameSummaryRepository
 from infrastructure.database.repositories.user_repository import UserRepository
 from infrastructure.disk.disk import Disk
 from infrastructure.disk.models.disk_config import DiskConfig
@@ -235,10 +237,18 @@ def _build_infra_dict(configs_dict: Dict[str, Any]) -> Dict[str, Any]:
   }
 
 def _build_repos_dict(database: Database) -> Dict[str, Any]:
+  account_repository = AccountRepository(
+    database=database
+  )
+  game_summary_repository = GameSummaryRepository(
+    database=database
+  )
   user_repository = UserRepository(
     database=database
   )
   return {
+    "account": account_repository,
+    "game_summary": game_summary_repository,
     "user": user_repository
   }
 

@@ -17,18 +17,10 @@ class Database(BaseInfrastructure):
   _session_factory: sessionmaker
 
   def __init__(self, database_config: DatabaseConfig):
+    _ = database_config
     try:
-      engine_str = database_config.engine
-      if engine_str == "postgresql":
-        engine_str = f"{engine_str}+psycopg"
-      username = database_config.username
-      password = quote_plus(database_config.password)
-      host = database_config.host
-      port = database_config.port
-      name = database_config.name
       self._engine = create_engine(
-        f"{engine_str}://{username}:{password}@{host}:{port}/{name}",
-        connect_args={"connect_timeout": 5}
+        f"sqlite:///sc2-data-manager.db"
       )
       self._session_factory = sessionmaker(bind=self._engine, future=True, expire_on_commit=False)
       if not getattr(self._engine, "_schema_initialized", False):

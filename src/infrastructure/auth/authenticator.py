@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from sqlmodel import select
 
@@ -33,7 +33,7 @@ class Authenticator(AuthenticatorInterface):
       raise TokenRevokedErr()
     if (
       auth_token.expires_at is not None
-      and auth_token.expires_at < datetime.now(tz=UTC)
+      and auth_token.expires_at < datetime.now(tz=timezone.utc)
     ):
       raise TokenExpiredErr()
     return auth_token.user_ulid

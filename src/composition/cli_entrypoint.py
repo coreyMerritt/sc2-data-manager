@@ -14,11 +14,13 @@ def entrypoint():
   handle_args_routing(
     args=args,
     logger=resources.infra.logger,
+    account_repository=resources.repos.account,
     config_parser=resources.infra.config_parser,
     cpu=resources.infra.cpu,
     database=resources.infra.database,
     disk=resources.infra.disk,
     environment=resources.infra.environment,
+    game_summary_repository=resources.repos.game_summary,
     memory=resources.infra.memory,
     run_webserver=run_webserver
   )
@@ -40,6 +42,8 @@ def build_resources() -> AppResources:
     token_issuer=resources_dict["infra"]["token_issuer"]
   )
   repos = RepositoryCollection(
+    account=resources_dict["repos"]["account"],
+    game_summary=resources_dict["repos"]["game_summary"],
     user=resources_dict["repos"]["user"]
   )
   app_vars = VarsCollection(

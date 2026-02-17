@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 from sqlmodel import Field, SQLModel
 
@@ -32,4 +32,4 @@ class UserORM(SQLModel, table=True):
     default_factory=lambda: datetime.now(tz=timezone.utc),
     nullable=False
   )
-  disabled_at: Optional[datetime] = Field(default=None)
+  disabled_at: datetime | None = Field(default=None)

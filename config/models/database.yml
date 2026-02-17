@@ -1,4 +1,4 @@
-engine: "postgresql"
+engine: "sqlite"
 host: "127.0.0.1"
 name: "db_name"
 password: "db_password"

@@ -1,5 +1,5 @@
-from datetime import UTC, datetime
-from typing import ClassVar, Optional
+from datetime import datetime, timezone
+from typing import ClassVar
 
 import ulid
 from sqlmodel import Column, DateTime, Field, SQLModel
@@ -25,15 +25,15 @@ class AuthTokenORM(SQLModel, table=True):
     nullable=False,
     max_length=255,
   )
-  expires_at: Optional[datetime] = Field(
+  expires_at: datetime | None = Field(
     sa_column=Column(DateTime(timezone=True)),
     default=None
   )
-  revoked_at: Optional[datetime] = Field(
+  revoked_at: datetime | None = Field(
     sa_column=Column(DateTime(timezone=True)),
     default=None
   )
   created_at: datetime = Field(
-    default_factory=lambda: datetime.now(tz=UTC),
+    default_factory=lambda: datetime.now(tz=timezone.utc),
     nullable=False,
   )
