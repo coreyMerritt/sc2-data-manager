@@ -13,7 +13,7 @@ def register_409_conflict_handlers(app: FastAPI) -> None:
     MESSAGE = "Conflict"
     CODE = 409
     logger: LoggerInterface = req.app.state.resources.infra.logger
-    logger.error(
+    logger.warning(
       message=MESSAGE,
       error=exc
     )
