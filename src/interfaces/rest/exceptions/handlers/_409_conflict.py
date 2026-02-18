@@ -14,7 +14,6 @@ def register_409_conflict_handlers(app: FastAPI) -> None:
     CODE = 409
     logger: LoggerInterface = req.app.state.resources.infra.logger
     logger.warning(
-      message=MESSAGE,
-      error=exc
+      message=MESSAGE
     )
     return await universal_exception_response(MESSAGE, CODE)
